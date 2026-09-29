@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'">
+  <title>Matura Zap</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark">
+  <main id="activation" class="activation hidden">
+    <section class="activation-card">
+      <img src="../assets/logo.png" alt="Matura Zap" class="activation-logo">
+      <div class="shield">✓</div>
+      <span class="eyebrow">ATIVAÇÃO DO APLICATIVO</span>
+      <h1>Tudo pronto para começar</h1>
+      <p>Cole sua chave de licença para liberar o Matura Zap neste Mac.</p>
+      <label for="licenseKey">Chave de licença</label>
+      <div class="copy-row"><input id="licenseKey" autocomplete="off" spellcheck="false"><button id="pasteKey" class="secondary">Colar chave</button></div>
+      <button id="activateButton" class="primary full">Ativar neste computador</button>
+      <div id="activationMessage" class="message"></div>
+    </section>
+  </main>
+
+  <div id="application" class="app hidden">
+    <header class="topbar">
+      <img src="../assets/logo.png" alt="Matura Zap" class="logo">
+      <div class="top-actions"><span id="licenseStatus" class="license-pill"></span><button id="themeButton" class="icon-button" title="Alternar tema">☾</button></div>
+    </header>
+    <div id="updateBanner" class="update-banner hidden"><span id="updateText"></span><button id="installUpdate" class="small">Instalar agora</button></div>
+    <div class="layout">
+      <aside class="sidebar">
+        <button class="nav active" data-view="accounts">Contas</button>
+        <button class="nav" data-view="warm">Aquecimento</button>
+        <div class="sidebar-foot">Matura Zap para macOS<br><span id="version"></span></div>
+      </aside>
+      <section class="content">
+        <div id="accountsView" class="view">
+          <div class="page-head"><div><span class="eyebrow">SUAS CONTAS</span><h1>WhatsApps organizados</h1><p>Cadastre, conecte e acompanhe suas contas em um só lugar.</p></div></div>
+          <div class="grid">
+            <form id="accountForm" class="card account-form">
+              <h2>Adicionar conta</h2>
+              <label for="number">Número do WhatsApp</label>
+              <input id="number" placeholder="(51) 99999-9999" required>
+              <small>O país 55 será adicionado automaticamente quando necessário.</small>
+              <label for="nickname">Nome da conta</label>
+              <input id="nickname" placeholder="Ex.: Atendimento, Comercial">
+              <label for="proxy">Proxy HTTP <span>(opcional)</span></label>
+              <input id="proxy" placeholder="http://usuario:senha@host:porta">
+              <button class="primary full" type="submit">Salvar conta</button>
+              <div id="accountMessage" class="message"></div>
+            </form>
+            <div class="card accounts-card">
+              <div class="card-head"><div><h2>Minhas contas</h2><p>Abra a conta para escanear o QR Code.</p></div><button id="refreshStatus" class="secondary small">Atualizar</button></div>
+              <div id="accountList" class="account-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="warmView" class="view hidden">
+          <div class="page-head"><div><span class="eyebrow">AQUECIMENTO</span><h1>Conversas com ritmo natural</h1><p>Selecione contas conectadas, configure os intervalos e acompanhe cada envio.</p></div></div>
+          <div class="warm-grid">
+            <section class="card">
+              <h2>1. Contas participantes</h2>
+              <div id="warmAccounts" class="select-list"></div>
+              <h2>2. Mensagens</h2>
+              <textarea id="messages" rows="9" placeholder="Olá! Tudo bem?&#10;&#10;Tudo ótimo! E com você?&#10;&#10;Como está seu dia?&#10;&#10;Está indo muito bem!"></textarea>
+              <small>Separe cada mensagem com uma linha em branco. O sistema usa mensagens consecutivas como pergunta e resposta.</small>
+            </section>
+            <section class="card execution-card">
+              <h2>3. Tempo e repetições</h2>
+              <div class="timing-grid">
+                <div><label for="minimum">Intervalo mínimo</label><input id="minimum" type="number" min="1" max="86400" value="11"><small>Espera mínima entre dois envios.</small></div>
+                <div><label for="maximum">Intervalo máximo</label><input id="maximum" type="number" min="1" max="86400" value="21"><small>Espera máxima, escolhida aleatoriamente.</small></div>
+                <div><label for="repetitions">Repetições</label><input id="repetitions" type="number" min="1" max="100000" value="1"><small>Quantidade de ciclos completos entre as contas.</small></div>
+              </div>
+              <div class="execution-summary"><strong id="executionTitle">Pronto para iniciar</strong><span id="executionDetail">Nenhuma execução em andamento.</span><div class="progress"><i id="progressBar"></i></div></div>
+              <div class="button-row"><button id="startWarm" class="primary">Iniciar aquecimento</button><button id="stopWarm" class="danger" disabled>Parar</button></div>
+              <div id="warmMessage" class="message"></div>
+              <div id="activity" class="activity"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
+
