@@ -108,12 +108,23 @@ window.matura.onWarmProgress(value => {
 
 window.matura.onUpdate(value => {
   const banner = $('#updateBanner');
+  const activation = $('#activationUpdate');
+  const showManual = text => {
+    $('#activationUpdateText').textContent = text;
+    activation.classList.remove('hidden');
+    banner.classList.remove('hidden');
+    $('#updateText').textContent = text;
+    $('#installUpdate').textContent = 'Baixar nova versão';
+    $('#installUpdate').classList.remove('hidden');
+    $('#installUpdate').dataset.manual = '1';
+  };
   if (value.state === 'ready') { banner.classList.remove('hidden'); $('#updateText').textContent = `Matura Zap ${value.version} está pronto para instalar.`; $('#installUpdate').classList.remove('hidden'); }
   else if (value.state === 'downloading') { banner.classList.remove('hidden'); $('#updateText').textContent = `Baixando atualização ${value.version}…`; $('#installUpdate').classList.add('hidden'); }
   else if (value.state === 'progress') { banner.classList.remove('hidden'); $('#updateText').textContent = `Baixando atualização: ${value.percent}%`; }
   else if (value.state === 'license-error') { banner.classList.remove('hidden'); $('#updateText').textContent = value.message; $('#installUpdate').classList.add('hidden'); }
+  else if (value.state === 'manual') showManual(value.message || `Matura Zap ${value.version} está disponível.`);
 });
-$('#installUpdate').addEventListener('click', () => window.matura.installUpdate());
+$('#installUpdate').addEventListener('click', event => event.currentTarget.dataset.manual === '1' ? window.matura.downloadUpdate() : window.matura.installUpdate());
+$('#activationDownload').addEventListener('click', () => window.matura.downloadUpdate());
 
 boot();
-

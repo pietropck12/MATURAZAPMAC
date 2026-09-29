@@ -13,7 +13,7 @@ contextBridge.exposeInMainWorld('matura', {
   startWarm: options => ipcRenderer.invoke('warm:start', options),
   stopWarm: () => ipcRenderer.invoke('warm:stop'),
   installUpdate: () => ipcRenderer.invoke('update:install'),
+  downloadUpdate: () => ipcRenderer.invoke('update:download'),
   onWarmProgress: callback => ipcRenderer.on('warm:progress', (_event, value) => callback(value)),
   onUpdate: callback => ipcRenderer.on('update:status', (_event, value) => callback(value))
 });
-

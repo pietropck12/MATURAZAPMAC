@@ -1,6 +1,6 @@
 {
   "name": "maturazap-mac",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Matura Zap para macOS",
   "main": "src/main.js",
   "author": "Matura Zap",
@@ -8,7 +8,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test test/*.test.js",
-    "check": "node --check src/main.js && node --check src/license-service.js && node --check src/account-service.js && node --check src/whatsapp.js && node --check src/preload.js && node --check renderer/app.js",
+    "check": "node --check src/main.js && node --check src/license-service.js && node --check src/account-service.js && node --check src/whatsapp.js && node --check src/update-service.js && node --check src/preload.js && node --check renderer/app.js",
     "icons": "bash scripts/create-icons.sh",
     "dist:mac": "npm run icons && electron-builder --mac dmg zip --universal",
     "release:mac": "npm run icons && electron-builder --mac dmg zip --universal --publish always"
@@ -83,5 +83,8 @@
       "repo": "MATURAZAPMAC",
       "releaseType": "release"
     }
+  },
+  "matura": {
+    "signedAutoUpdate": false
   }
 }

@@ -1,11 +1,13 @@
 'use strict';
 
 const path = require('node:path');
-const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, net } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { LicenseService } = require('./license-service');
 const { AccountService } = require('./account-service');
 const { WhatsAppService } = require('./whatsapp');
+const { isNewerVersion, parseLatestVersion, MANIFEST_URL, DOWNLOAD_URL } = require('./update-service');
+const SIGNED_AUTO_UPDATE = require('../package.json').matura?.signedAutoUpdate === true;
 
 let mainWindow;
 let license;
@@ -113,18 +115,33 @@ function configureIpc() {
   handle('warm:start', runWarm);
   handle('warm:stop', async () => { warmController?.abort(); return true; });
   handle('update:install', async () => { autoUpdater.quitAndInstall(false, true); return true; });
+  handle('update:download', async () => { await shell.openExternal(DOWNLOAD_URL); return true; });
+}
+
+async function checkManualUpdate(notify) {
+  const response = await net.fetch(MANIFEST_URL, { redirect: 'follow' });
+  if (!response.ok) throw new Error(`Atualização indisponível (HTTP ${response.status}).`);
+  const version = parseLatestVersion(await response.text());
+  if (isNewerVersion(version, app.getVersion())) notify({ state: 'manual', version, url: DOWNLOAD_URL });
 }
 
 function configureUpdates() {
   if (!app.isPackaged) return;
+  const notify = value => mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents.send('update:status', value);
+  // Squirrel.Mac cannot replace an unsigned app. Keep the direct installer
+  // visible even on the activation screen so users are never trapped there.
+  if (!SIGNED_AUTO_UPDATE) {
+    setTimeout(() => checkManualUpdate(notify).catch(() => {}), 3000);
+    setInterval(() => checkManualUpdate(notify).catch(() => {}), 4 * 60 * 60 * 1000);
+    return;
+  }
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
-  const notify = value => mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents.send('update:status', value);
   autoUpdater.on('checking-for-update', () => notify({ state: 'checking' }));
   autoUpdater.on('update-available', info => notify({ state: 'downloading', version: info.version }));
   autoUpdater.on('download-progress', progress => notify({ state: 'progress', percent: Math.round(progress.percent) }));
   autoUpdater.on('update-downloaded', info => notify({ state: 'ready', version: info.version }));
-  autoUpdater.on('error', () => notify({ state: 'error', message: 'Não foi possível verificar a atualização agora.' }));
+  autoUpdater.on('error', () => notify({ state: 'manual', message: 'Existe uma nova versão. Baixe o instalador para atualizar.', url: DOWNLOAD_URL }));
   setTimeout(() => autoUpdater.checkForUpdates().catch(() => {}), 5000);
   setInterval(() => autoUpdater.checkForUpdates().catch(() => {}), 4 * 60 * 60 * 1000);
 }
@@ -143,4 +160,3 @@ app.whenReady().then(async () => {
 
 app.on('window-all-closed', () => app.quit());
 app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
-
