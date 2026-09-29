@@ -1,6 +1,6 @@
 {
   "name": "maturazap-mac",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Matura Zap para macOS",
   "main": "src/main.js",
   "author": "Matura Zap",
@@ -45,11 +45,15 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["universal"]
+          "arch": [
+            "universal"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["universal"]
+          "arch": [
+            "universal"
+          ]
         }
       ],
       "hardenedRuntime": true,
@@ -61,8 +65,16 @@
       "title": "Matura Zap ${version}",
       "iconSize": 128,
       "contents": [
-        { "x": 160, "y": 210 },
-        { "x": 440, "y": 210, "type": "link", "path": "/Applications" }
+        {
+          "x": 160,
+          "y": 210
+        },
+        {
+          "x": 440,
+          "y": 210,
+          "type": "link",
+          "path": "/Applications"
+        }
       ]
     },
     "publish": {

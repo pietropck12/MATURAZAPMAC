@@ -26,6 +26,23 @@ class LicenseError extends Error {
   constructor(message, code = 'license_error') { super(message); this.code = code; }
 }
 
+function verifyEnvelope(envelope, type = 'license', publicKey = PUBLIC_KEY) {
+  if (!envelope?.payload || !envelope?.signature) throw new LicenseError('Resposta de licença ausente.');
+  const encodedPayload = String(envelope.payload);
+  // The panel signs the Base64 text itself. Decoding it before verification
+  // changes the bytes and rejects every legitimate entitlement.
+  const valid = crypto.verify(
+    'RSA-SHA256',
+    Buffer.from(encodedPayload, 'utf8'),
+    publicKey,
+    Buffer.from(envelope.signature, 'base64')
+  );
+  if (!valid) throw new LicenseError('Não foi possível verificar a autenticidade da licença.', 'invalid_signature');
+  const claims = JSON.parse(Buffer.from(encodedPayload, 'base64').toString('utf8'));
+  if (claims.type !== type) throw new LicenseError('Resposta de licença inválida.');
+  return claims;
+}
+
 class LicenseService {
   constructor(userData) {
     this.statePath = path.join(userData, 'activation.dat');
@@ -40,13 +57,7 @@ class LicenseService {
   }
 
   verify(envelope, type = 'license') {
-    if (!envelope?.payload || !envelope?.signature) throw new LicenseError('Resposta de licença ausente.');
-    const payload = Buffer.from(envelope.payload, 'base64');
-    const valid = crypto.verify('RSA-SHA256', payload, PUBLIC_KEY, Buffer.from(envelope.signature, 'base64'));
-    if (!valid) throw new LicenseError('Não foi possível verificar a autenticidade da licença.', 'invalid_signature');
-    const claims = JSON.parse(payload.toString('utf8'));
-    if (claims.type !== type) throw new LicenseError('Resposta de licença inválida.');
-    return claims;
+    return verifyEnvelope(envelope, type);
   }
 
   load() {
@@ -173,5 +184,4 @@ class LicenseService {
   }
 }
 
-module.exports = { LicenseService, LicenseError, PUBLIC_KEY, API_BASE };
-
+module.exports = { LicenseService, LicenseError, PUBLIC_KEY, API_BASE, verifyEnvelope };
