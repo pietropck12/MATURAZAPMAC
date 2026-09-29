@@ -13,6 +13,12 @@ jobs:
   macos:
     runs-on: macos-14
     timeout-minutes: 45
+    env:
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
@@ -30,10 +36,7 @@ jobs:
         run: npm run check && npm test
 
       - name: Importar certificado Apple
-        if: ${{ secrets.CSC_LINK != '' }}
-        env:
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        if: ${{ env.CSC_LINK != '' }}
         run: |
           echo "$CSC_LINK" | base64 --decode > certificate.p12
           security create-keychain -p actions build.keychain
@@ -45,8 +48,5 @@ jobs:
       - name: Gerar instaladores e publicar
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.CSC_LINK != '' }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ env.CSC_LINK != '' }}
         run: npm run release:mac
