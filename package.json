@@ -1,6 +1,6 @@
 {
   "name": "maturazap-mac",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Matura Zap para macOS",
   "main": "src/main.js",
   "author": "Matura Zap",
@@ -10,8 +10,8 @@
     "test": "node --test test/*.test.js",
     "check": "node --check src/main.js && node --check src/license-service.js && node --check src/account-service.js && node --check src/whatsapp.js && node --check src/preload.js && node --check renderer/app.js",
     "icons": "bash scripts/create-icons.sh",
-    "dist:mac": "npm run icons && electron-builder --mac dmg zip --x64 --arm64",
-    "release:mac": "npm run icons && electron-builder --mac dmg zip --x64 --arm64 --publish always"
+    "dist:mac": "npm run icons && electron-builder --mac dmg zip --universal",
+    "release:mac": "npm run icons && electron-builder --mac dmg zip --universal --publish always"
   },
   "dependencies": {
     "electron-updater": "^6.6.2",
@@ -41,15 +41,15 @@
     "mac": {
       "category": "public.app-category.business",
       "icon": "build/icon.icns",
-      "artifactName": "MaturaZap-Mac-${version}-${arch}.${ext}",
+      "artifactName": "MaturaZap-Mac-Instalador-${arch}.${ext}",
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": ["universal"]
         },
         {
           "target": "zip",
-          "arch": ["x64", "arm64"]
+          "arch": ["universal"]
         }
       ],
       "hardenedRuntime": true,
@@ -73,4 +73,3 @@
     }
   }
 }
-
